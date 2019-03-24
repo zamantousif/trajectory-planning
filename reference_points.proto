@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package ivex;
+
+message ReferencePoints {
+  repeated Point points = 1;
+
+  message Point {
+    optional double x = 1;
+    optional double y = 2;
+  }
+}
