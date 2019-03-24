@@ -7,7 +7,7 @@
 using namespace std;
 
 // define constants
-constexpr size_t LARGEVAL()(return ipow(10,10));
+const double LARGEVAL = 1000000.0;
 
 // function to compute distance between two points in cartesian plane
 double distance(double x1, double y1, double x2, double y2){
@@ -15,13 +15,13 @@ double distance(double x1, double y1, double x2, double y2){
 }
 
 // function to find the waypoint closest to a given point on the plane
-int findWaypoint(double x, double y, vector<pair<double, double> > v){
+int findWaypoint(double x, double y, const vector<pair<double, double>>& v){
     int waypoint = 0;
     int refTrajX, refTrajY;
     double dist;
-    double closestDist = LARGEVAL();
+    double closestDist = LARGEVAL;
     // iterate over the vector to find the shortest distance between the waypoints and the given point on the cartesian plane
-    for(auto i: v){
+    for(int i = 0; i < v.size(); ++i){
         refTrajX = v[i].first;
         refTrajY = v[i].second;
         dist = distance(x, y, refTrajX, refTrajY);
@@ -33,7 +33,6 @@ int findWaypoint(double x, double y, vector<pair<double, double> > v){
     }
     return waypoint;
 }
-
 
 // C++ template to print the contents of the vector
 template <typename d1, typename d2>
@@ -50,14 +49,14 @@ ostream& operator<<(ostream& os, const vector<d1, d2>& v)
 class Car{
     public:
 
-    int plotRefTraj(vector<pair<double, double> > v);
-    vector<pair<double, double> > cartesianToFrenet(double x, double y);
+    int plotRefTraj(const vector<pair<double, double>>& v);
+    vector<pair<double, double>> cartesianToFrenet(double x, double y, const vector<pair<double, double>>& v);
 
 };
 
 // task #1
 // class member function to plot a continuous reference trajectory given a set of points in the cartesian plane
-int Car::plotRefTraj(vector<pair<double, double> > v){
+int Car::plotRefTraj(const vector<pair<double, double>>& v){
     // gnuplot object
     Gnuplot gp;
     // plot a continuous reference trajectory using the XY coordinates
@@ -68,12 +67,13 @@ int Car::plotRefTraj(vector<pair<double, double> > v){
 
 // task #2
 // class member function to convert point in cartesian coordinate system (X,Y) to the frenet coordinate system (Latitude, Longitude)
-vector<pair<double, double> > cartesianToFrenet(double x, double y, vector<pair<double, double> > v){
+vector<pair<double, double>> Car::cartesianToFrenet(double x, double y, const vector<pair<double, double>>& v){
     double frenet_latitude = 0.0;
     double frenet_longitude= 0.0;
     double ax, ay, bx, by, x1, y1, x2, y2;
-    vector <pair<double, double> > frenet_vec;
     double scaling_fac;
+    double frenet_long = 0;
+    vector <pair<double, double>> frenet_vec;
     int waypoint_num;
     bool leftX = false;
     bool leftY = false;
@@ -95,8 +95,8 @@ vector<pair<double, double> > cartesianToFrenet(double x, double y, vector<pair<
     // k = some scaling factor for vector b
     // k = a.b/b.b where . is the vector dot product
     scaling_fac = (ax*bx + ay*by)/(bx*bx + by*by);
-    projection_x = scaling_fac*bx;
-    projection_y = scaling_fac*by;
+    double projection_x = scaling_fac*bx;
+    double projection_y = scaling_fac*by;
 
     // latitude on the frenet coordinate system
     double frenet_lat = distance(x, y, projection_x, projection_y);
@@ -115,12 +115,13 @@ vector<pair<double, double> > cartesianToFrenet(double x, double y, vector<pair<
     // longitude on the frenet coordinate system
     // compute distance until the waypoint closest to the given point (x,y) and add up the distance of this waypoint to the point (x,y)
     for(int i = 0; i < waypoint_num; ++i){
-        double frenet_long += distance(v[i].first, v[i].second, v[i+1].first, v[i+1].second);
+        frenet_long += distance(v[i].first, v[i].second, v[i+1].first, v[i+1].second);
     }
 
     frenet_long += distance(x, y, v[waypoint_num].first, v[waypoint_num].second);
 
-    frenet_vec = make_pair(frenet_lat, frenet_long);
+    // pair frenet_lat and frenet_long and store the pair in vector
+    frenet_vec.push_back(make_pair(frenet_lat, frenet_long));
 
     return frenet_vec;
 }
@@ -135,7 +136,8 @@ int main(){
 
     vector<int> pts_X;
     vector<int> pts_Y;
-    vector<pair<double, double> > pts_XY;
+    vector<pair<double, double>> pts_XY;
+    vector<pair<double, double>> pt_frenet;
 
     double X = 0;
     double Y = 0;
@@ -165,7 +167,12 @@ int main(){
     // plot the reference trajectory from the XY coordinates
     car1.plotRefTraj(pts_XY);
     // mouse click event that triggers cartesianToFrenet method of object car1
-    frenetLatLong = car1.cartesianToFrenet(x, y, pts_XY);
+    double x = 0.0;
+    double y = 0.0;
+    // trigger cartesianToFrenet method of object car1
+    pt_frenet = car1.cartesianToFrenet(x, y, pts_XY);
+    // display frenet point in the plot/screen
+    cout << pt_frenet << endl;
 
     return 0;
 }
