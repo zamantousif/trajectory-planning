@@ -15,4 +15,4 @@ An illustration can be found in the image below. The red line is the reference l
 ![](images/illustration2.png)
 
 Instructions to compile the project:
-g++ -o program-out test1.cpp -std=C++11 -lboost_iostreams -lboost_system -lboost_filesystem
+g++ -o program-out trajectory.cpp -std=C++11 -lboost_iostreams -lboost_system -lboost_filesystem
