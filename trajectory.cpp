@@ -41,7 +41,6 @@ int findWaypoint(double x, double y, const vector<pair<double, double>>& v){
     // ensure that the chosen waypoint is such that the vector drawn from it to the given point (x,y) makes an acute angle
 
 
-
     cout << "Nearest waypoint is " << waypoint << endl;
     return waypoint;
 }
@@ -80,7 +79,7 @@ int Car::plotRefTraj(const vector<pair<double, double>>& v){
 // task #2
 // class member function to convert point in cartesian coordinate system (X,Y) to the frenet coordinate system (Latitude, Longitude)
 vector<pair<double, double>> Car::cartesianToFrenet(double x, double y, const vector<pair<double, double>>& v){
-    double ax, ay, bx, by, x1, y1, x2, y2;
+    double vx, vy, sx, sy, x1, y1, x2, y2;
     double scaling_fac;
     double frenet_long = 0.0;
     vector <pair<double, double>> frenet_vec;
@@ -99,44 +98,50 @@ vector<pair<double, double>> Car::cartesianToFrenet(double x, double y, const ve
 
     cout << "x2 = " << x2 << " " << "y2 = " << y2 << endl;
     cout << "x1 = " << x1 << " " << "y1 = " << y1 << endl;
-    // compute x and y components of vector a between (x,y) and the previous waypoint (x1,y1)
-    ax = x - x1;
-    ay = y - y1;
-    cout << "vector a = " << ax << " " << ay << endl;
-    // compute x and y components of vector b between nearest waypoint (x2,y2) and the previous waypoint (x1,y1) both located on the reference trajectory
-    bx = x2 - x1;
-    by = y2 - y1;
-    cout << "vector b = " << bx << " " << by << endl;
+    // compute x and y components of vector V between (x,y) and the nearest waypoint (x1,y1) on the reference trajectory
+    vx = x - x1;
+    vy = y - y1;
+    cout << "vector V = " << vx << " " << vy << endl;
+    // compute x and y components of vector S between nearest waypoint (x1,y1) and the next waypoint (x2,y2) both located on the reference trajectory
+    sx = x2 - x1;
+    sy = y2 - y1;
+    cout << "vector S = " << sx << " " << sy << endl;
     // next step is to compute the projection of (x,y) on the reference trajectory
-    // vector b lies on the reference trajectory and therefore kb.(a-kb) = 0
-    // k = some scaling factor for vector b
-    // k = a.b/b.b where . is the vector dot product
-    scaling_fac = (ax*bx + ay*by)/(bx*bx + by*by);
-    double projection_x = scaling_fac*bx;
-    double projection_y = scaling_fac*by;
-    cout << "projection_x = " << projection_x << " " << "projection_y = " << projection_y << endl;
+    // vector s lies on the reference trajectory and therefore ks.(a-ks) = 0
+    // k = some scaling factor for vector s
+    // k = v.s/s.s where "." is the vector dot product
+    scaling_fac = (vx*sx + vy*sy)/(sx*sx + sy*sy);
+    double proj_x = scaling_fac*sx;
+    double proj_y = scaling_fac*sy;
+    cout << "projection_x = " << proj_x << " " << "projection_y = " << proj_y << endl;
 
     // latitude on the frenet coordinate system
-    double frenet_lat = getDistance(x, y, projection_x, projection_y);
+    double frenet_lat = getDistance(x, y, proj_x, proj_y);
 
-    // check if the given point (x,y) is on the left/right of the reference trajectory
-    if(x > projection_x)
+    // check if the given point (x,y) is on the left/right of the reference trajectory and update frenet latitude
+    if(x >= proj_x)
         leftX = true;
 
-    if(y > projection_y)
+    if(y >= proj_y)
         leftY = true;
 
     if(leftX && leftY){
         frenet_lat *= -1;
     }
 
+    // if projection of the given point is same as the point, then the point lies on the reference trajectory itself, in that case update frenet latitude to 0
+    if(x == proj_x) && (y == proj_y){
+        frenet_lat = 0;
+    }
+
     // longitude on the frenet coordinate system
-    // compute distance until the waypoint closest to the given point (x,y) and add up the distance of this waypoint to the point (x,y)
+    // compute distance until the waypoint nearest to the given point (x,y)
     for(int i = 0; i < waypoint_num; ++i){
         frenet_long += getDistance(v[i].first, v[i].second, v[i+1].first, v[i+1].second);
     }
+    // add up the distance of this waypoint to the projection of (x,y)
+    frenet_long += getDistance(proj_x, proj_y, v[waypoint_num].first, v[waypoint_num].second);
 
-    frenet_long += getDistance(projection_x, projection_y, v[waypoint_num].first, v[waypoint_num].second);
 
     // pair frenet_lat and frenet_long and store the pair in vector
     frenet_vec.push_back(make_pair(frenet_lat, frenet_long));
