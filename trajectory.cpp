@@ -129,8 +129,8 @@ vector<pair<double, double>> Car::cartesianToFrenet(double x, double y, const ve
         frenet_lat *= -1;
     }
 
-    // if projection of the given point is same as the point, then the point lies on the reference trajectory itself, in that case update frenet latitude to 0
-    if(x == proj_x) && (y == proj_y){
+    // if the point lies on the reference trajectory itself, update frenet latitude to 0
+    if((proj_x == 0.0) && (proj_y == 0.0)){
         frenet_lat = 0;
     }
 
@@ -189,8 +189,12 @@ int main(){
     car1.plotRefTraj(pts_XY);
 
     // mouse click event that triggers cartesianToFrenet method of object car1
-    double x = 41.9993400574;
-    double y = -0.101188264787;
+    // double x = 41.9993400574;
+    // double y = -0.101188264787;
+    double x = 2.5;
+    double y = 2.5;
+    
+
     cout << "Given point = " << x << " " << y << endl;
     // trigger cartesianToFrenet method of object car1
     pt_frenet = car1.cartesianToFrenet(x, y, pts_XY);
