@@ -33,12 +33,17 @@ double dotProduct(double ax, double ay, double bx, double by){
 }
 
 // function to compute the angle between two vectors a and b in 2D plane
-double getAngle(double ax, double ay, double bx, double by){
-    double theta = 0.0;
-    theta = acos((ax*bx + ay*by)/(sqrt(ax*ax + ay*ay) * sqrt(bx*bx + by*by))) * (180.0 / PI);
-
-    return theta;
+double getAngle(double x, double y){
+    return atan2(y, x) * (180.0 / PI);
 }
+
+// double getAngle(double ax, double ay, double bx, double by){
+//     double theta = 0.0;
+//     theta = acos((ax*bx + ay*by)/(sqrt(ax*ax + ay*ay) * sqrt(bx*bx + by*by))) * (180.0 / PI);
+//
+//     return theta;
+// }
+
 
 // function to find the waypoint on the reference trajectory that is closest to a given point on the same plane
 int findWaypoint(double x, double y, const vector<pair<double, double>>& v){
@@ -140,7 +145,7 @@ vector<pair<double, double>> Car::cartesianToFrenet(double x, double y, const ve
     sy = y1 - y2;
     cout << "vector S = " << sx << " " << sy << endl;
 
-    double angle = atan2(sy, sx) * (180.0 / PI);
+    double angle = getAngle(sy, sx);
     cout << "theta from atan2 = " << angle << endl;
 
     // latitude on the frenet coordinate system
@@ -243,8 +248,8 @@ int main(){
     // double x = 0.0;
     // double y = 0.119615256786;
     // 2nd point on reference trajectory
-    double x = 1.99999809265;
-    double y = 0.116609536111;
+    // double x = 1.99999809265;
+    // double y = 0.116609536111;
     // end point on reference trajectory
     // double x = 41.9993400574;
     // double y = -0.101188264787;
@@ -254,8 +259,8 @@ int main(){
     // double x = 40.0;
     // double y = -0.05;
     // right of reference trajectory
-    // double x = 15.0;
-    // double y = 0.0;
+    double x = 15.0;
+    double y = 0.0;
     // double x = 3.994565;
     // double y = 0.02345;
     // corner case with zero input
