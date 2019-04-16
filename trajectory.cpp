@@ -98,7 +98,6 @@ int Car::plotRefTraj(const vector<pair<double, double>>& v){
 // class member function to convert point in cartesian coordinate system (X,Y) to the frenet coordinate system (Latitude, Longitude)
 vector<pair<double, double>> Car::cartesianToFrenet(double x, double y, const vector<pair<double, double>>& v){
     double vx, vy, sx, sy, x1, y1, x2, y2;
-    double scaling_fac;
     double frenet_long = 0.0;
     vector <pair<double, double>> frenet_vec;
     int waypoint_num;
@@ -140,32 +139,13 @@ vector<pair<double, double>> Car::cartesianToFrenet(double x, double y, const ve
     sx = x1 - x2;
     sy = y1 - y2;
     cout << "vector S = " << sx << " " << sy << endl;
-    // next step is to compute the projection of (x,y) on the reference trajectory
-    // vector s lies on the reference trajectory and therefore ks.(a-ks) = 0
-    // k = some scaling factor for vector s
-    // k = v.s/s.s where "." is the vector dot product
-    scaling_fac = (vx*sx + vy*sy)/(sx*sx + sy*sy);
-    double proj_x = scaling_fac*sx;
-    double proj_y = scaling_fac*sy;
-    cout << "projection_x = " << proj_x << " " << "projection_y = " << proj_y << endl;
 
-    // form new vector (vs) connecting (x2,y2) to (x1,y1) and (vh) parallel to X axis respectively
-    double vs_x = x1 - x2;
-    double vs_y = y1 - y2;
-    double vh_x = x2 - x2; // vp_x = 0.0
-    double vh_y = y1 - y2;
-
-    double th = getAngle(vs_x,vs_y,1,0);
-    cout << "theta1 from acos = " << th << endl;
-    double th1 = atan2(vs_y, vs_x) * (180.0 / PI);
+    double th1 = atan2(sy, sx) * (180.0 / PI);
     cout << "theta1 from atan2 = " << th1 << endl;
 
     // latitude on the frenet coordinate system
     double dist_v = getDistance(x, y, x1, y1);
     double frenet_lat = dist_v * cos(th);
-
-    double frenet_lat1 = getDistance(x, y, proj_x, proj_y);
-
 
     // Sign of the cross Product of vector s and vector v determines the position of the point (x,y) with respect to the vector s on reference trajectory
     double cp = crossProduct(sx, sy, vx, vy);
@@ -208,9 +188,6 @@ vector<pair<double, double>> Car::cartesianToFrenet(double x, double y, const ve
     // Ignore this accuracy at the start and end points of the trajectory
     if ((waypoint_num != 0) && (waypoint_num != waypoint_max))
         frenet_long += long_acc;
-
-    // add up the distance of this waypoint to the projection of (x,y)
-    // frenet_long += getDistance(proj_x, proj_y, v[waypoint_num].first, v[waypoint_num].second);
 
     // pair frenet_lat and frenet_long and store the pair in vector
     frenet_vec.push_back(make_pair(frenet_lat1, frenet_long));
@@ -260,8 +237,7 @@ int main(){
     car1.plotRefTraj(pts_XY);
 
 
-    // test cases:
-
+    // Test Inputs:
 
     // start point on reference trajectory
     // double x = 0.0;
