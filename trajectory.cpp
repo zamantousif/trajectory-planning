@@ -140,12 +140,12 @@ vector<pair<double, double>> Car::cartesianToFrenet(double x, double y, const ve
     sy = y1 - y2;
     cout << "vector S = " << sx << " " << sy << endl;
 
-    double th1 = atan2(sy, sx) * (180.0 / PI);
-    cout << "theta1 from atan2 = " << th1 << endl;
+    double angle = atan2(sy, sx) * (180.0 / PI);
+    cout << "theta from atan2 = " << angle << endl;
 
     // latitude on the frenet coordinate system
     double dist_v = getDistance(x, y, x1, y1);
-    double frenet_lat = dist_v * cos(th);
+    double frenet_lat = dist_v * cos(angle);
 
     // Sign of the cross Product of vector s and vector v determines the position of the point (x,y) with respect to the vector s on reference trajectory
     double cp = crossProduct(sx, sy, vx, vy);
@@ -183,14 +183,14 @@ vector<pair<double, double>> Car::cartesianToFrenet(double x, double y, const ve
         frenet_long += getDistance(v[i].first, v[i].second, v[i+1].first, v[i+1].second);
     }
     // add up the parallel distance of the given point (x,y) from nearest waypoint (x1,y1) for more accuracy
-    double long_acc = dist_v * sin(th);
+    double long_acc = dist_v * sin(angle);
     cout << "longitude accuracy = " << long_acc << endl;
     // Ignore this accuracy at the start and end points of the trajectory
     if ((waypoint_num != 0) && (waypoint_num != waypoint_max))
         frenet_long += long_acc;
 
     // pair frenet_lat and frenet_long and store the pair in vector
-    frenet_vec.push_back(make_pair(frenet_lat1, frenet_long));
+    frenet_vec.push_back(make_pair(frenet_lat, frenet_long));
 
     return frenet_vec;
 }
