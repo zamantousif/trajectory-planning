@@ -12,8 +12,7 @@ cmake_minimum_required(VERSION 3.14)
 project(TRAJECTORY_PLANNING VERSION 1.0.0 LANGUAGES CXX)
 
 find_package( Boost COMPONENTS system filesystem iostreams REQUIRED ) #whatever libs you need
-include_directories( ${Boost_INCLUDE_DIRS} )
-
+include_directories( ${Boost_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)
 
 # Options: Things you can set via commandline options to cmake (e.g. -DENABLE_LTO=[ON|OFF])
 option(ENABLE_WARNINGS_SETTINGS "Allow target_set_warnings to add flags and defines.
