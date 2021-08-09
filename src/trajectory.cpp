@@ -1,13 +1,9 @@
 #include <iostream>
-#include <fstream>
-#include <vector>
 #include "gnuplot-iostream.h"
+#include "trajectory.hpp"
+
 //#include "test1.h"
 
-using namespace std;
-
-// define constants
-const double LARGEVAL = 1000000.0;
 
 // function to compute distance between two points in cartesian plane
 double distance(double x1, double y1, double x2, double y2){
@@ -15,13 +11,14 @@ double distance(double x1, double y1, double x2, double y2){
 }
 
 // function to find the waypoint closest to a given point on the plane
-int findWaypoint(double x, double y, const vector<pair<double, double>>& v){
+int findWaypoint(double x, double y, const vector<pair<double, double>>& v)
+{
     int waypoint = 0;
     int refTrajX, refTrajY;
     double dist;
     double closestDist = LARGEVAL;
     // iterate over the vector to find the shortest distance between the waypoints and the given point on the cartesian plane
-    for(int i = 0; i < v.size(); ++i){
+    for(unsigned int i = 0; i < v.size(); ++i){
         refTrajX = v[i].first;
         refTrajY = v[i].second;
         dist = distance(x, y, refTrajX, refTrajY);
@@ -34,25 +31,6 @@ int findWaypoint(double x, double y, const vector<pair<double, double>>& v){
     return waypoint;
 }
 
-// C++ template to print the contents of the vector
-template <typename d1, typename d2>
-ostream& operator<<(ostream& os, const vector<d1, d2>& v)
-{
-    // iterate over the vector v to print each coordinate pair
-    for(int i = 0; i < v.size(); ++i)
-        os << "(" << v[i].first << ", " << v[i].second << ")";
-
-    return os;
-}
-
-// Class for the ego car
-class Car{
-    public:
-
-    int plotRefTraj(const vector<pair<double, double>>& v);
-    vector<pair<double, double>> cartesianToFrenet(double x, double y, const vector<pair<double, double>>& v);
-
-};
 
 // task #1
 // class member function to plot a continuous reference trajectory given a set of points in the cartesian plane
@@ -68,8 +46,9 @@ int Car::plotRefTraj(const vector<pair<double, double>>& v){
 // task #2
 // class member function to convert point in cartesian coordinate system (X,Y) to the frenet coordinate system (Latitude, Longitude)
 vector<pair<double, double>> Car::cartesianToFrenet(double x, double y, const vector<pair<double, double>>& v){
-    double frenet_latitude = 0.0;
-    double frenet_longitude= 0.0;
+    //double frenet_latitude = 0.0;
+    //double frenet_longitude= 0.0;
+
     double ax, ay, bx, by, x1, y1, x2, y2;
     double scaling_fac;
     double frenet_long = 0;
@@ -124,55 +103,4 @@ vector<pair<double, double>> Car::cartesianToFrenet(double x, double y, const ve
     frenet_vec.push_back(make_pair(frenet_lat, frenet_long));
 
     return frenet_vec;
-}
-
-// main
-int main(){
-
-    // open file to read the coordinates before plotting them
-    ifstream file("input.txt");
-    // Car object
-    Car car1;
-
-    vector<int> pts_X;
-    vector<int> pts_Y;
-    vector<pair<double, double>> pts_XY;
-    vector<pair<double, double>> pt_frenet;
-
-    double X = 0;
-    double Y = 0;
-
-    // scan each line in the file to update the points to the respective array
-    if(file.is_open()){
-        string line;
-        int numline = 1;
-        while(getline(file, line)){
-            // odd lines contain X while even lines contain Y
-            if(numline % 2 == 1){
-                X = stod(line);
-            }
-            else{
-                Y = stod(line);
-                // make X,Y pair and store in a vector
-                pts_XY.push_back(make_pair(X,Y));
-            }
-            numline++;
-        }
-    }
-    file.close();
-
-    // print the XY coordinate pairs
-    cout << pts_XY << endl;
-
-    // plot the reference trajectory from the XY coordinates
-    car1.plotRefTraj(pts_XY);
-    // mouse click event that triggers cartesianToFrenet method of object car1
-    double x = 0.0;
-    double y = 0.0;
-    // trigger cartesianToFrenet method of object car1
-    pt_frenet = car1.cartesianToFrenet(x, y, pts_XY);
-    // display frenet point in the plot/screen
-    cout << pt_frenet << endl;
-
-    return 0;
 }
