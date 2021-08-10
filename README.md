@@ -19,3 +19,4 @@ An illustration can be found in the image below. The red line is the reference l
 2. `cmake ..`
 3. `make`
 4. `make test`
+5. `./main`
