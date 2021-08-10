@@ -13,3 +13,10 @@ Sample input points are given as a protobuf message in text format, which can be
 An illustration can be found in the image below. The red line is the reference line.
 
 ![](images/illustration2.png)
+
+## How to build and test
+1. `mkdir build && cd build`
+2. `cmake ..`
+3. `make`
+4. `make test`
+5. `./main`
